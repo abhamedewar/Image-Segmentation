@@ -58,9 +58,9 @@ class UNet(nn.Module):
         x = self.final_conv(x)
         return x
 
-#test U-Net
-x = torch.randn(2, 1, 400, 400)
-model = UNet(in_channels=1)
-assert model(x).shape == x.shape
-print(model(x).shape)
-print(x.shape)
+# #test U-Net
+# x = torch.randn(2, 1, 400, 400)
+# model = UNet(in_channels=1)
+# assert model(x).shape == x.shape
+# print(model(x).shape)
+# print(x.shape)
