@@ -24,8 +24,50 @@ def load_checkpoint(checkpoint, model):
     model.load_state_dict(checkpoint['state_dict'])
 
 def check_accuracy(loader, model, device):
-    #implement dice score
-    pass
+
+    '''
+    Intersection:
+
+    (preds * mask).sum(): This computes the element-wise multiplication of the predicted mask (preds)
+    and the ground truth mask (mask). The resulting tensor will have a value of 1 (True) only where both
+    masks have a positive value (overlap).
+
+    .sum(): The sum operation calculates the total number of pixels where the intersection occurs (number of True values).
+    Union:
+
+    (preds + mask).sum(): This computes the element-wise addition of the predicted mask (preds) and the
+    ground truth mask (mask). The resulting tensor will have a value of 1 (True) where either of the masks
+    has a positive value.
+
+    .sum(): The sum operation calculates the total number of pixels where the union occurs (number of True values).
+    Epsilon:
+
+    1e-7: A small constant added to the denominator to avoid division by zero.
+    It ensures numerical stability in case both the intersection and union are zero.
+    
+    '''
+
+    num_correct = 0
+    num_pixels  = 0
+    dice_score  = 0
+
+    model.eval()
+
+    with torch.no_grad():
+        for img, mask in tqdm(loader):
+            img   = img.to(device)
+            mask  = mask.to(device).unsqueeze(1)
+            preds = torch.sigmoid(model(img))
+            preds = (preds > 0.5).float()
+            num_correct += (preds == mask).sum()
+            num_pixels += torch.numel(preds)
+            dice_score += (2 * (preds * mask).sum()) / (
+                (preds + mask).sum() + 1e-7
+            )
+
+    print(f"Got {num_correct}/{num_pixels} with pixel accuracy {num_correct/num_pixels*100:.2f}")
+    print(f"Dice score: {dice_score/len(loader)*100:.2f}")
+    
 
 def save_augmentations(train_image_path, train_mask_path, train_transform, s, augment):
 
@@ -49,4 +91,3 @@ def save_augmentations(train_image_path, train_mask_path, train_transform, s, au
         mask.save(os.path.join(train_aug_mask, image_name))
     end = time.time()
     print("Time taken for augmentation:", (end - start)//60, "mins")    
-    
