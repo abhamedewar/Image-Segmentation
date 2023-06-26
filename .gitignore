@@ -1,1 +1,4 @@
 data
+data_split
+train
+split_data.py

@@ -2,13 +2,16 @@ from torch.utils.data import Dataset
 import torch
 from PIL import Image
 import os
+import numpy as np
+import torchvision.transforms.functional as F
 
 class HumanDataset(Dataset):
 
-    def __init__(self, image_dir, mask_dir, transform):
+    def __init__(self, image_dir, mask_dir, augment=False, transform=None):
         self.image_dir = image_dir
         self.mask_dir = mask_dir
         self.transform = transform
+        self.augment = augment
         self.images = os.listdir(self.image_dir)
 
     def __len__(self):
@@ -22,15 +25,18 @@ class HumanDataset(Dataset):
         image_id = os.path.join(self.image_dir, self.images[index])
         mask_id = os.path.join(self.mask_dir, self.images[index])
         #might have to convert these to np.array
-        image = Image.open(image_id)
-        mask = Image.open(mask_id)            #some preprocessing might be required here
-
-        mask = self.preprocess(mask)
+        image = np.array(Image.open(image_id).convert("RGB"))
+        mask = np.array(Image.open(mask_id).convert("L"))            #some preprocessing might be required here
+        if not self.augment:
+            mask = self.preprocess(mask)
 
         if self.transform:
-            augmentations = self.transform(image)
+            augmentations = self.transform(image = image, mask=mask)
             image = augmentations['image']
             mask = augmentations['mask']
 
+        if self.augment:
+            return image_id.split('\\')[-1], image, mask
+        
         return image, mask
     
