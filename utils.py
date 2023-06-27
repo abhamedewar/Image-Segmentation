@@ -5,6 +5,10 @@ import os
 import time
 from tqdm import tqdm
 from PIL import Image
+import wandb
+import torchvision.transforms as T
+import torchvision
+import matplotlib.pyplot as plt
 
 def get_loaders(train_image_path, train_mask_path, valid_image_path, valid_mask_path,  \
                 transform, batch_size, num_worker, pin_mem):
@@ -20,10 +24,12 @@ def get_loaders(train_image_path, train_mask_path, valid_image_path, valid_mask_
 def save_checkpoint(state, filename):
     torch.save(state, filename)
 
-def load_checkpoint(checkpoint, model):
+def load_checkpoint(chk_path, model):
+    checkpoint = torch.load(chk_path)
     model.load_state_dict(checkpoint['state_dict'])
+    return model
 
-def check_accuracy(loader, model, device):
+def check_accuracy(loader, model, loss_fn, device, log_images=False, batch_idx=0):
 
     '''
     Intersection:
@@ -54,20 +60,42 @@ def check_accuracy(loader, model, device):
     model.eval()
 
     with torch.no_grad():
-        for img, mask in tqdm(loader):
-            img   = img.to(device)
-            mask  = mask.to(device).unsqueeze(1)
-            preds = torch.sigmoid(model(img))
-            preds = (preds > 0.5).float()
-            num_correct += (preds == mask).sum()
-            num_pixels += torch.numel(preds)
-            dice_score += (2 * (preds * mask).sum()) / (
-                (preds + mask).sum() + 1e-7
+        loop = tqdm(enumerate(loader), total=len(loader), leave=False)
+        for idx, (data, target) in loop:
+            data   = data.to(device)
+            target  = target.float().to(device).unsqueeze(1)
+            pred = model(data)
+            loss = loss_fn(pred, target)
+            pred = torch.sigmoid(pred)
+            pred = (pred > 0.5).float()
+            num_correct += (pred == target).sum()
+            num_pixels += torch.numel(pred)
+            dice_score += (2 * (pred * target).sum()) / (
+                (pred + target).sum() + 1e-7
             )
+        
+            if idx == batch_idx and log_images:
+                log_image_table(data, pred, target, device) 
 
-    print(f"Got {num_correct}/{num_pixels} with pixel accuracy {num_correct/num_pixels*100:.2f}")
-    print(f"Dice score: {dice_score/len(loader)*100:.2f}")
-    
+    pixel_accuracy = (num_correct/num_pixels) * 100
+    dice = dice_score/len(loader)*100
+    print(f"Got {num_correct}/{num_pixels} with pixel accuracy {pixel_accuracy:.2f}")
+    print(f"Dice score: {dice:.2f}")
+
+    return loss.item(), pixel_accuracy, dice
+
+def log_image_table(images, masks, target, device):
+
+    MEAN = torch.tensor([0.485, 0.456, 0.406]).to(device)
+    STD = torch.tensor([0.229, 0.224, 0.225]).to(device)
+    table = wandb.Table(columns=["image", "predicted mask", "target"])
+    for img, pred, target in zip(images, masks, target):
+        pred = pred * 255
+        target = target * 255
+        img = img * STD[:, None, None] + MEAN[:, None, None]
+        table.add_data(wandb.Image(img.squeeze().permute(1, 2, 0).cpu().numpy()), 
+                       wandb.Image(pred.squeeze().cpu().numpy()), wandb.Image(target.squeeze().cpu().numpy()))
+    wandb.log({"predictions_table":table}, commit=False)
 
 def save_augmentations(train_image_path, train_mask_path, train_transform, s, augment):
 
@@ -89,5 +117,6 @@ def save_augmentations(train_image_path, train_mask_path, train_transform, s, au
         mask = Image.fromarray(mask)
         image.save(os.path.join(train_aug_image, image_name))
         mask.save(os.path.join(train_aug_mask, image_name))
+        
     end = time.time()
     print("Time taken for augmentation:", (end - start)//60, "mins")    

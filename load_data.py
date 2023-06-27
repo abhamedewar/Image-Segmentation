@@ -23,10 +23,10 @@ class HumanDataset(Dataset):
 
     def __getitem__(self, index):
         image_id = os.path.join(self.image_dir, self.images[index])
-        mask_id = os.path.join(self.mask_dir, self.images[index])
+        mask_id = os.path.join(self.mask_dir, self.images[index]).replace('img', 'mask')
         #might have to convert these to np.array
         image = np.array(Image.open(image_id).convert("RGB"))
-        mask = np.array(Image.open(mask_id).convert("L"))            #some preprocessing might be required here
+        mask = np.array(Image.open(mask_id).convert("L"), dtype=np.float32)            #some preprocessing might be required here
         if not self.augment:
             mask = self.preprocess(mask)
 

@@ -14,6 +14,16 @@ t2 = A.Compose([
     A.Rotate(limit=40, p=1, border_mode=cv2.BORDER_CONSTANT)
 ])
 
+
+t3 = A.Compose([
+    A.Resize(640, 720)
+])
+
+
+# def generate_augmentations(train_data_path, train_mask_path, augment):
+#     for t, s in [(t1, 'combine'), (t2, "rotate")]:
+#         save_augmentations(train_data_path, train_mask_path, t, s, augment)
+
 def generate_augmentations(train_data_path, train_mask_path, augment):
-    for t, s in [(t1, 'combine'), (t2, "rotate")]:
+    for t, s in [(t3, 'resize')]:
         save_augmentations(train_data_path, train_mask_path, t, s, augment)

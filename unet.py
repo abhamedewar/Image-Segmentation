@@ -21,7 +21,7 @@ class UNet(nn.Module):
         super(UNet, self).__init__()
         self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
         self.down = nn.ModuleList()
-
+        self.dropout = nn.Dropout(p=0.6)
         for f in features:
             self.down.append(DoubleConv(in_channels, f))
             in_channels = f
@@ -44,6 +44,7 @@ class UNet(nn.Module):
             x = layer(x)
             skip_connections.append(x)
             x = self.pool(x)
+            x = self.dropout(x)
     
         x = self.bottleneck(x)
         i = len(skip_connections) - 1

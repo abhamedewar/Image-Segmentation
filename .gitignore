@@ -2,3 +2,10 @@ data
 data_split
 train
 split_data.py
+wandb
+archive
+combine.py
+humans
+saved_model_pond.pth
+saved_model_rosy_wave.pth
+saved_model.pth
