@@ -1,4 +1,16 @@
-# Image Segmentation- U-Net architecture from scratch
+# Deep Background: U-Net-Based Image Background Segmentation and Color Modification
+
+Enhancing Images with Custom Backgrounds
+## $\color{blue}{UNet-\ Implementation\ from\ scratch}$
+## $\color{blue}{Dice Score: 98.90}$
+
+### Project Summary
+
+This project focuses on background segmentation and color modification in images using a U-Net model. The U-Net architecture, is implemented from scratch to accurately segment the background from an input image.
+
+The goal of the project is to provide a solution for changing the background color of images while preserving the main subject. The trained U-Net model generates a mask that identifies the background region in an image. This mask is then used to modify the background color, allowing for the incorporation of custom backgrounds.
+
+https://github.com/abhamedewar/Image-Segmentation/assets/20626950/077220c6-02c8-4784-94e4-2b9c96e01b81
 
 ### Human Segmentation Dataset
 
