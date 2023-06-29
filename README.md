@@ -1,7 +1,85 @@
 # Image Segmentation- U-Net architecture from scratch
 
-Link to the paper: https://arxiv.org/abs/1505.04597
+### Human Segmentation Dataset
 
+This dataset is a collection of images used for human segmentation.
+
+### Dataset Details
+
+* Number of Training Images: 24,042
+* Number of Validation and Test Images: 10,383
+* Image Size: 256 x 256 pixels
+
+### Running the code:
+
+```
+python train.py --train_data_path <folder with all images> --train_mask_path <folder with train masks>
+--valid_data_path <folder with validation images> --valid_mask_path <folder with validation masks>
+```
+
+Refer train.py for to change other parameters
+
+### Model Architecture:
+
+The architecture used for semantic segmentation is __U-Net, which is implemented from scratch.__
+
+### Data Preprocessing:
+
+The following data preprocessing techniques were applied to the training dataset:
+
+* Horizontal Flip: Randomly flips the images horizontally to augment the dataset.
+* Rotation: Randomly rotates the images to add variability.
+* Random Blur
+
+Albumentation library was used to perform augmentation of training images and masks.
+
+### Training Process
+
+The model was trained using the following configurations:
+
+* Number of Epochs: 10
+* Learning Rate: 0.0001
+* Learning Rate Scheduler: Step LR
+* Batch Size: 16
+
+### Validation Metric
+The validation of the segmentation model was evaluated using the following metrics:
+
+* __Dice Score:__ Measures the overlap between the predicted segmentation mask and the ground truth mask.
+* __Pixel Accuracy:__ Computes the accuracy of the predicted segmentation at the pixel level.
+
+To visualize the training process and monitor the model's performance, Weight and Biases (wandb) was used. The following visualizations were tracked:
+
+* Training Loss: The loss value during training.
+* Validation Loss: The loss value during validation.
+* Validation Accuracy: The accuracy of the model on the validation dataset.
+* Sample Images: Selected images from the training dataset were displayed to observe the model's predictions during training.
+  
+By leveraging the U-Net architecture, applying data preprocessing techniques, and monitoring the training process with visualization, the semantic segmentation model was trained and evaluated effectively.
+
+### Results:
+
+__The Dice Score obtained for the semantic segmentation model: 98.90%__
+
+
+Validation Dice Score and Pixel Accuracy Plots:
+
+![image](https://github.com/abhamedewar/Image-Segmentation/assets/20626950/5f90e656-554a-4859-bcb7-18787c928219)
+
+Training Loss:
+
+![image](https://github.com/abhamedewar/Image-Segmentation/assets/20626950/b6caf2b9-2e04-422d-a1d2-57fbd3f76c71)
+
+
+Validation Loss:
+
+![image](https://github.com/abhamedewar/Image-Segmentation/assets/20626950/4d19409e-e802-4363-821a-85794b5d6814)
+
+Predictions:
+
+![image](https://github.com/abhamedewar/Image-Segmentation/assets/20626950/bccfe40c-fda4-44d0-9d6a-801251bf360f)
+
+### Other details
 Image segmentation is the process of dividing an image into multiple distinct regions or segments based on the characteristics of the pixel in the image. 
 
 Now that we know that each pixel is classified into some class and pixels of same class are grouped together, segmentation can be further classified into the following types:
