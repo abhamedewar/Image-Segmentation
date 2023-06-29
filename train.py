@@ -18,8 +18,8 @@ parser.add_argument('--train_data_path', default=r'.\humans\train\images', type=
 parser.add_argument('--train_mask_path', default=r'.\humans\train\masks', type=str)
 parser.add_argument('--valid_data_path', default=r'.\humans\validation\images', type=str)
 parser.add_argument('--valid_mask_path', default=r'.\humans\validation\masks', type=str)
-parser.add_argument('--num_epoch', default=20, type=int)
-parser.add_argument('--batch_size', default=1, type=int)
+parser.add_argument('--num_epoch', default=10, type=int)
+parser.add_argument('--batch_size', default=16, type=int)
 parser.add_argument('--num_worker', default=0, type=int)
 parser.add_argument('--load_model', default=False, type=bool)
 parser.add_argument('--image_height', default=256, type=int)
@@ -37,7 +37,7 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print("Using ", device)
 wandb.init(project="Semantic Segmentation")
 
-def train(loader, model, optimizer, loss_fn, scaler, num_epoch, epoch, scheduler):
+def train(loader, valid_loader, model, optimizer, loss_fn, scaler, num_epoch, epoch, scheduler):
     n_steps_per_epoch = math.ceil(len(loader.dataset) / args.batch_size)
     loop = tqdm(enumerate(loader), total=len(loader), leave=False)
     for idx, (data, targets) in loop:
@@ -58,9 +58,17 @@ def train(loader, model, optimizer, loss_fn, scaler, num_epoch, epoch, scheduler
 
         metrics = {"train/train_loss": loss.item(),"train/epoch":  (idx + (n_steps_per_epoch * epoch)) / n_steps_per_epoch}
         wandb.log({**metrics})
+        if idx%700 == 0:
+            if idx == 0:
+                continue
+            valid_loss, pixel_acc, dice_score = check_accuracy(valid_loader, model, loss_fn, device, True, 3)
+            val_metrics = {"val/val_loss": valid_loss, "val/pixel_accuracy": pixel_acc, "val/dice_score": dice_score}
+            wandb.log({**val_metrics})
+
     scheduler.step()
     print(f"Epoch ({epoch}/{num_epoch}]")
     print(f"Loss {loss.item()}")
+
 
 # def run_prediction(model, valid_loaderr, loss): 
 #     MEAN = torch.tensor([0.485, 0.456, 0.406]).to(device)
@@ -129,7 +137,7 @@ def main():
         )
 
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-    scheduler = StepLR(optimizer, step_size=10, gamma=0.1)
+    scheduler = StepLR(optimizer, step_size=5, gamma=0.1)
     grad_scaler = torch.cuda.amp.GradScaler()
     loss = nn.CrossEntropyLoss() if args.num_classes > 1 else nn.BCEWithLogitsLoss()
 
@@ -137,13 +145,16 @@ def main():
     # exit()
 
     for epoch in range(args.num_epoch):
-        train(train_loader, model, optimizer, loss, grad_scaler, args.num_epoch, epoch, scheduler)
+        train(train_loader, valid_loader, model, optimizer, loss, grad_scaler, args.num_epoch, epoch, scheduler)
         valid_loss, pixel_acc, dice_score = check_accuracy(valid_loader, model, loss, device, True, 3)
-        val_metrics = {"val/val_loss": valid_loss, "val/pixel_accuracy": pixel_acc, "val/dice_score": dice_score}
+        val_metrics = {"val/val_loss_epoch": valid_loss, "val/pixel_accuracy_epoch": pixel_acc, "val/dice_score_epoch": dice_score}
         wandb.log({**val_metrics})
+        if epoch % 2 == 0:
+            checkpoint = {"state_dict": model.state_dict(), "optimizer": optimizer.state_dict(), "epoch":epoch}
+            name = str(epoch) + '_' +  "saved_model.pth"
+            save_checkpoint(checkpoint, name)
     wandb.finish()
-    checkpoint = {"state_dict": model.state_dict(), "optimizer": optimizer.state_dict()}
-    save_checkpoint(checkpoint, "saved_model.pth")
+
 
 if __name__=="__main__":
     main()

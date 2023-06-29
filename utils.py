@@ -16,6 +16,27 @@ def get_loaders(train_image_path, train_mask_path, valid_image_path, valid_mask_
     train_human_dataset = HumanDataset(train_image_path, train_mask_path, transform = transform)
     validation_human_dataset = HumanDataset(valid_image_path, valid_mask_path, transform = transform)
     
+    # i = 0
+    # for image, mask in train_human_dataset:
+    #     i += 1
+        # unique_values, counts = torch.unique(mask, return_counts=True)
+        # print(unique_values, counts)
+        # print(mask.shape)
+        # fig, axs = plt.subplots(1, 2)
+
+        # # Plot image 1
+        # axs[0].imshow(image.permute(1, 2, 0).numpy())
+        # axs[0].set_title('Image')
+
+        # # Plot image 2
+        # axs[1].imshow(mask.numpy(), cmap='gray')
+        # axs[1].set_title('Mask')
+
+        # plt.tight_layout()
+        # plt.show()
+        # if i == 2:
+        #     exit()
+
     trainloader = DataLoader(train_human_dataset, batch_size, shuffle=True, num_workers=num_worker, pin_memory=pin_mem)
     validloader = DataLoader(validation_human_dataset, batch_size, shuffle=True, num_workers=num_worker, pin_memory=pin_mem)
 

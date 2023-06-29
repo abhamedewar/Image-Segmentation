@@ -18,7 +18,8 @@ class HumanDataset(Dataset):
         return len(self.images)
 
     def preprocess(self, img):
-        img[img == 255.0] = 1.0
+        # img[img == 255.0] = 1.0
+        img = (img > 127)
         return img
 
     def __getitem__(self, index):
