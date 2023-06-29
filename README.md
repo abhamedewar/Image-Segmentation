@@ -10,7 +10,7 @@ This dataset is a collection of images used for human segmentation.
 * Number of Validation and Test Images: 10,383
 * Image Size: 256 x 256 pixels
 
-### Running the code:
+### Running the training code:
 
 ```
 python train.py --train_data_path <folder with all images> --train_mask_path <folder with train masks>
@@ -18,6 +18,13 @@ python train.py --train_data_path <folder with all images> --train_mask_path <fo
 ```
 
 Refer train.py for to change other parameters
+
+### Running the prediction code:
+
+```
+python change_color.py ----image_path <path to image to change color> --color <hex color value>
+```
+
 
 ### Model Architecture:
 
