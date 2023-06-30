@@ -1,4 +1,4 @@
-# Deep Background: U-Net-Based Image Background Segmentation and Color Modification
+# Deep Background: U-Net-Based Image Background Segmentation and Editing
 
 Enhancing Images with Custom Backgrounds
 ## $\color{blue}{UNet-\ Implementation\ from\ scratch}$
