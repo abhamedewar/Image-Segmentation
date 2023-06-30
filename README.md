@@ -12,6 +12,12 @@ The goal of the project is to provide a solution for changing the background col
 
 https://github.com/abhamedewar/Image-Segmentation/assets/20626950/077220c6-02c8-4784-94e4-2b9c96e01b81
 
+### Output Screenshot
+
+<img src="https://github.com/abhamedewar/Image-Segmentation/assets/20626950/c5675b68-c24d-4c9e-95d5-4f197f3fe589" width="400" height="400">
+
+<img src="https://github.com/abhamedewar/Image-Segmentation/assets/20626950/7148784d-f588-4929-9301-53d50e253706" width="400" height="400">
+
 ### Human Segmentation Dataset
 
 This dataset is a collection of images used for human segmentation.
