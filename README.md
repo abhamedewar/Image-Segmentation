@@ -1,4 +1,22 @@
-# Image Segmentation- U-Net architecture from scratch
+# Deep Background: U-Net-Based Image Background Segmentation and Editing
+
+Enhancing Images with Custom Backgrounds
+## $\color{blue}{UNet-\ Implementation\ from\ scratch}$
+## $\color{blue}{Dice Score: 98.90}$
+
+### Project Summary
+
+This project focuses on background segmentation and color modification in images using a U-Net model. The U-Net architecture, is implemented from scratch to accurately segment the background from an input image.
+
+The goal of the project is to provide a solution for changing the background color of images while preserving the main subject. The trained U-Net model generates a mask that identifies the background region in an image. This mask is then used to modify the background color, allowing for the incorporation of custom backgrounds.
+
+https://github.com/abhamedewar/Image-Segmentation/assets/20626950/077220c6-02c8-4784-94e4-2b9c96e01b81
+
+### Output Screenshot
+
+<img src="https://github.com/abhamedewar/Image-Segmentation/assets/20626950/c5675b68-c24d-4c9e-95d5-4f197f3fe589" width="400" height="400">
+
+<img src="https://github.com/abhamedewar/Image-Segmentation/assets/20626950/7148784d-f588-4929-9301-53d50e253706" width="400" height="400">
 
 ### Human Segmentation Dataset
 
@@ -10,7 +28,7 @@ This dataset is a collection of images used for human segmentation.
 * Number of Validation and Test Images: 10,383
 * Image Size: 256 x 256 pixels
 
-### Running the code:
+### Running the training code:
 
 ```
 python train.py --train_data_path <folder with all images> --train_mask_path <folder with train masks>
@@ -18,6 +36,13 @@ python train.py --train_data_path <folder with all images> --train_mask_path <fo
 ```
 
 Refer train.py for to change other parameters
+
+### Running the prediction code:
+
+```
+python change_color.py ----image_path <path to image to change color> --color <hex color value>
+```
+
 
 ### Model Architecture:
 
