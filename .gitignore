@@ -15,3 +15,7 @@ saved_model.pth
 6_saved_model.pth
 8_saved_model.pth
 output.mp4
+output_trim.mp4
+output1.png
+output2.png
+segment_background.onnx
